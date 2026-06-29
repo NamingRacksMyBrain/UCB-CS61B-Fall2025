@@ -4,8 +4,27 @@ public class DoubleUp {
      * Example: doubleUp("hello") -> "hheelllloo"
      */
    public static String doubleUp(String s) {
-      // TODO: Fill in this function
-      return null;
+      // Prevent NullPointerException
+      if (s == null) {
+         return null;
+      }
+
+      // Original O(N**2)
+//      String doubleS = "";
+//      int sLength = s.length();
+//      for (int i = 0; i < sLength; i++) {
+//         doubleS += s.charAt(i);
+//         doubleS += s.charAt(i);
+//      }
+//      return doubleS;
+      
+      StringBuilder doubleS = new StringBuilder();
+      int sLength = s.length();
+      for (int i = 0; i < sLength; i++) {
+         doubleS.append(s.charAt(i));
+         doubleS.append(s.charAt(i));
+      }
+      return doubleS.toString();
    }
    
    public static void main(String[] args) {
