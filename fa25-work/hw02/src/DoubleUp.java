@@ -9,24 +9,24 @@ public class DoubleUp {
          return null;
       }
 
-      // Original O(N**2)
-//      String doubleS = "";
-//      int sLength = s.length();
-//      for (int i = 0; i < sLength; i++) {
-//         doubleS += s.charAt(i);
-//         doubleS += s.charAt(i);
-//      }
-//      return doubleS;
-      
+      // Original implementation: O(N**2)
+      /**
+      String doubleS = "";
+      for (int i = 0; i < s.length(); i++) {
+         doubleS += s.charAt(i);
+         doubleS += s.charAt(i);
+      }
+      return doubleS;
+       */
+
       StringBuilder doubleS = new StringBuilder();
-      int sLength = s.length();
-      for (int i = 0; i < sLength; i++) {
+      for (int i = 0; i < s.length(); i++) {
          doubleS.append(s.charAt(i));
          doubleS.append(s.charAt(i));
       }
       return doubleS.toString();
    }
-   
+
    public static void main(String[] args) {
       String s = doubleUp("hello");
       System.out.println(s);
