@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class ArrayDeque61B<T> implements Deque61B<T> {
     private T[] items;
@@ -207,23 +208,77 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         items = newItems;
     }
 
-    private class WizardIterator implements Iterator<T> {
-        private int wizPos;
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o instanceof Deque61B<?> mySet) {
+            if (size != mySet.size()) {
+                return false;
+            }
+            for (int i = 0; i < size; i++) {
+                if (!get(i).equals(mySet.get(i))) {
+                    return false;
+                }
+            }
+            return true;
 
-        public WizardIterator() {
-            wizPos = 0;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(get(i));
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    /**
+     * I write the proj2 part that involves iterators/Object methods
+     * on the first day of the summer session at JiaDing. I name my iterator
+     * class to express the strong feeling: I miss DUODUO!
+     */
+    private class IMissDuoIterator implements Iterator<T> {
+        int duoPos;
+
+        IMissDuoIterator() {
+            duoPos = 0;
         }
 
+        /**
+         * Returns {@code true} if the iteration has more elements.
+         * (In other words, returns {@code true} if {@link #next} would
+         * return an element rather than throwing an exception.)
+         *
+         * @return {@code true} if the iteration has more elements
+         */
         @Override
         public boolean hasNext() {
-            return wizPos < size();
+            return duoPos < size;
         }
 
+        /**
+         * Returns the next element in the iteration.
+         *
+         * @return the next element in the iteration
+         * @throws NoSuchElementException if the iteration has no more elements
+         */
         @Override
         public T next() {
-            T thingToReturn = get(wizPos);
-            wizPos += 1;
-            return thingToReturn;
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            T nextItem = get(duoPos);
+            duoPos++;
+            return nextItem;
         }
     }
 
@@ -234,43 +289,34 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
      */
     @Override
     public Iterator<T> iterator() {
-        return new WizardIterator();
+        return new IMissDuoIterator();
     }
 
     /**
-     *  Checks whether the two Deque61B objects are equal
-     *  in terms of elements and order.
+     * How to add .iterator() method to ArrayDeque61B class?
+     * --------------------------------------------------------------------------
+     * Step1: In Deque61B, change
+     * public interface Deque61B<T>
+     *      to
+     * public interface Deque61B<T> extends Iterable<T>
      *
-     * @return {@code true} if equal and {@code false} otherwise
+     * because we want to guarantee that EVERY type of Deque we ever build
+     * can be iterated over using a beautiful, enhanced for-loop!
+     *
+     * After this step, your ArrayDeque61B class will have an .iterator() method
+     * --------------------------------------------------------------------------
+     * Step2: Create a new class.
+     * Mine here: private class IMissDuoIterator implements Iterator<T>
+     *
+     * which has 1 variable: duoPos
+     * and two methods:     .hasNext()
+     *                      .next()
+     * --------------------------------------------------------------------------
+     * Step3: Implement the .iterator() method in ArrayDeque61B class,
+     * which returns a new IMissDuoIterator instance.
+     *
+     * Note:
+     * manipulate hasNext() and next() is not our job! the for loop
+     * will take care of that!
      */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o instanceof ArrayDeque61B<?> uddaArrayDeque61B) {
-            if (size != uddaArrayDeque61B.size()) {
-                return false;
-            }
-            for (int i = 0; i < size; i++) {
-                if (!this.get(i).equals(uddaArrayDeque61B.get(i))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder stuff = new StringBuilder("[");
-        for (int i = 0; i < size - 1; i++) {
-            stuff.append(this.get(i)).append(", ");
-        }
-        stuff.append(this.get(size - 1)).append("]");
-        return stuff.toString();
-    }
-
 }
