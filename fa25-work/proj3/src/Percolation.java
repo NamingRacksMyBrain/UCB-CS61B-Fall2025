@@ -1,6 +1,9 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 import static java.lang.Math.*;
 
+/** Backwash solution: after percolation, if you open a site at the bottom row, it won't
+ *  be connected to virtualBottom, so it'll be full only if it's connected to virtualTop
+ *  without utilizing connection to virtualBottom. */
 public class Percolation {
     private int R;
     private int C;
@@ -10,10 +13,6 @@ public class Percolation {
     private int[] openSites; // 0 for unopen and 1 for open
     private WeightedQuickUnionUF sites;
     private boolean percolated;
-    // TODO: Backwash caused by the virtual top/bottom sites. REMEMBER THAT THERE'RE HINT VIDEOS.
-    /** 1st thought: Close virtualBottom after percolation, define a PERCOLATED
-     *  variable to indicate percolated or not.
-     *  Final solution: */
 
     /** Create an N-by-N grid, with all sites initially blocked */
     public Percolation(int N) {
@@ -44,7 +43,7 @@ public class Percolation {
         if (row == 0) {
             sites.union(xyTo1D(row, col), virtualTop);
         }
-        if (row == R - 1 && !percolated) {
+        if (row == R - 1 && !percolates()) {
             sites.union(xyTo1D(row, col), virtualBottom);
         }
     }

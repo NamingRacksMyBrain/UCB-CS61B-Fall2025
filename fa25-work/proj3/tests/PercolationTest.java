@@ -89,32 +89,35 @@ public class PercolationTest {
         assertThat(p.xyTo1D(4, 4)).isEqualTo(24);
     }
 
-    /** I don't know why this doesn't pass as in the interactive visualizer
-     *  {4, 3} is OPEN instead of FULL, but the test result says that
-     *  it's FULL. */
-    // @Test
-    // public void backWashTest() {
-    //     int N = 5;
-    //     Percolation p = new Percolation(N);
-    //     int[][] openSites = {
-    //             {0, 0},
-    //             {1, 0},
-    //             {2, 0},
-    //             {3, 0},
-    //             {4, 0},
-    //             {4, 3} // shouldn't be full
-    //     };
-    //     Cell[][] expectedState = {
-    //             {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED},
-    //             {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED},
-    //             {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED},
-    //             {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED},
-    //             {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.OPEN, Cell.CLOSED}
-    //     };
-    //     for (int[] site : openSites) {
-    //         p.open(site[0], site[1]);
-    //     }
-    //     assertThat(getState(N, p)).isEqualTo(expectedState);
-    //     assertThat(p.percolates()).isTrue();
-    // }
+    /** Last version: "I don't know why this fails, as in the interactive visualizer
+     *  {4, 3} is OPEN instead of FULL, but the test result says that it's FULL.
+     *  Reason: the visualizer calls percolates() frequently, while the previous version
+     *  of my Percolation.java, percolates() is never called, only the boolean variable
+     *  percolated is used.
+     *  Only when you call percolates(), percolated can be updated. */
+    @Test
+    public void backWashTest() {
+        int N = 5;
+        Percolation p = new Percolation(N);
+        int[][] openSites = {
+                {0, 0},
+                {1, 0},
+                {2, 0},
+                {3, 0},
+                {4, 0},
+                {4, 3} // shouldn't be full
+        };
+        Cell[][] expectedState = {
+                {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED},
+                {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED},
+                {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED},
+                {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED, Cell.CLOSED},
+                {Cell.FULL, Cell.CLOSED, Cell.CLOSED, Cell.OPEN, Cell.CLOSED}
+        };
+        for (int[] site : openSites) {
+            p.open(site[0], site[1]);
+        }
+        assertThat(getState(N, p)).isEqualTo(expectedState);
+        assertThat(p.percolates()).isTrue();
+    }
 }
