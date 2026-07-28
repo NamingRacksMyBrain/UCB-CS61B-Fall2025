@@ -78,11 +78,15 @@ public class PercolationTest {
         assertThat(p.percolates()).isTrue();
     }
 
-    // TODO: Using the given tests above as a template,
-    //       write some more tests and delete the fail() line
     @Test
-    public void yourFirstTestHere() {
-        fail("Did you write your own tests?");
+    public void xyTo1DTest() {
+        Percolation p = new Percolation(5);
+        assertThat(p.xyTo1D(0, 0)).isEqualTo(0);
+        assertThat(p.xyTo1D(0, 1)).isEqualTo(1);
+        assertThat(p.xyTo1D(2, 2)).isEqualTo(12);
+        assertThat(p.xyTo1D(2, 4)).isEqualTo(14);
+        assertThat(p.xyTo1D(3, 0)).isEqualTo(15);
+        assertThat(p.xyTo1D(4, 4)).isEqualTo(24);
     }
 
 }
