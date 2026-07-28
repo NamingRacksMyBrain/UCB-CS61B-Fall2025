@@ -1,9 +1,26 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 import static java.lang.Math.*;
 
-/** Backwash solution: after percolation, if you open a site at the bottom row, it won't
- *  be connected to virtualBottom, so it'll be full only if it's connected to virtualTop
- *  without utilizing connection to virtualBottom. */
+/**
+ *  Model of a percolation system using Disjoint Sets.
+ *
+ *  --- THE BACKWASH PROBLEM & SOLUTION ---
+ *  Original Flawed Approach:
+ *  Previously, I attempted to solve the "backwash" issue (where empty sites at the
+ *  bottom falsely appear full after the system percolates) by conditionally preventing
+ *  connections to the virtualBottom if the system had already percolated (!percolates()).
+ *  However, this failed for bottom sites opened BEFORE percolation. Once percolation
+ *  occurred elsewhere, those early bottom sites became transitively connected to the
+ *  virtualTop via the virtualBottom, causing backwash anyway.
+ *
+ *  New Solution (Two Union-Finds):
+ *  To completely prevent backwash, we use TWO WeightedQuickUnionUF objects:
+ *  1. fullSites: Contains BOTH virtualTop and virtualBottom.
+ *     Used strictly to check if the system percolates().
+ *  2. withoutBottomSites: Contains ONLY virtualTop (no virtualBottom).
+ *     Used strictly to check if a site isFull(). Since there is no virtualBottom
+ *     acting as a "backdoor" connection, water cannot flow backwards from the bottom!
+ */
 public class Percolation {
     private int R;
     private int C;
@@ -11,8 +28,8 @@ public class Percolation {
     private int virtualTop;
     private int virtualBottom;
     private int[] openSites; // 0 for unopen and 1 for open
-    private WeightedQuickUnionUF sites;
-    private boolean percolated;
+    private WeightedQuickUnionUF fullSites;
+    private WeightedQuickUnionUF withoutBottomSites;
 
     /** Create an N-by-N grid, with all sites initially blocked */
     public Percolation(int N) {
@@ -21,14 +38,14 @@ public class Percolation {
         }
         this.R = N;
         this.C = N;
-        this.sites = new WeightedQuickUnionUF(R * C + 2); // extra 2 are the virtual top and bottom sites
+        this.fullSites = new WeightedQuickUnionUF(R * C + 2); // extra 2 are the virtual top and bottom sites
+        this.withoutBottomSites = new WeightedQuickUnionUF(R * C + 1); // extra 1 is virtualTop
         this.openSites = new int[R * C + 2];
         virtualTop = R * C;
         virtualBottom = R * C + 1;
         openSites[virtualTop] = 1;
         openSites[virtualBottom] = 1;
         this.numberOfOpenSites = 0;
-        this.percolated = false;
     }
 
     /** Open the site (row, col) if it is not open already */
@@ -41,10 +58,11 @@ public class Percolation {
         numberOfOpenSites++;
         unionAdjacent(row, col);
         if (row == 0) {
-            sites.union(xyTo1D(row, col), virtualTop);
+            fullSites.union(xyTo1D(row, col), virtualTop);
+            withoutBottomSites.union(xyTo1D(row, col), virtualTop);
         }
-        if (row == R - 1 && !percolates()) {
-            sites.union(xyTo1D(row, col), virtualBottom);
+        if (row == R - 1) {
+            fullSites.union(xyTo1D(row, col), virtualBottom);
         }
     }
 
@@ -57,7 +75,7 @@ public class Percolation {
     /** Returns whether the site is full */
     public boolean isFull(int row, int col) {
         checkIndexOutOfBound(row, col);
-        return isOpen(row, col) && isConnected(virtualTop, xyTo1D(row, col));
+        return isOpen(row, col) && withoutBottomSites.connected(virtualTop, xyTo1D(row, col));
     }
 
     public int numberOfOpenSites() {
@@ -66,14 +84,7 @@ public class Percolation {
 
     /** Returns whether the system percolates */
     public boolean percolates() {
-        if (percolated) {
-            return true;
-        }
-        if (isConnected(virtualTop, virtualBottom)) {
-            percolated = true;
-            return true;
-        }
-        return false;
+        return (fullSites.connected(virtualTop, virtualBottom));
     }
 
     /** Transforms the (x, y) 2-D representation of a site into a 1-D single number. */
@@ -95,16 +106,11 @@ public class Percolation {
         for (int i = max(row - 1, 0); i <= min(row + 1, R - 1); i++) {
             for (int j = max(col - 1, 0); j <= min(col + 1, C - 1); j++) {
                 if (adjacent(i, j, row, col) && isOpen(i, j)) {
-                    sites.union(xyTo1D(row, col), xyTo1D(i, j));
+                    fullSites.union(xyTo1D(row, col), xyTo1D(i, j));
+                    withoutBottomSites.union(xyTo1D(row, col), xyTo1D(i, j));
                 }
             }
         }
-    }
-
-    /** Returns whether two sites are in the same set.
-     *  @param: {@code x}, {@code y} are the 1-D position of 2 sites */
-    private boolean isConnected(int x, int y) {
-        return sites.find(x) == sites.find(y) && openSites[x] == 1 && openSites[y] == 1;
     }
 
     /** Returns whether two sites are adjacent in the same row or col.
