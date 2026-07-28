@@ -9,9 +9,11 @@ public class Percolation {
     private int virtualBottom;
     private int[] openSites; // 0 for unopen and 1 for open
     private WeightedQuickUnionUF sites;
+    private boolean percolated;
     // TODO: Backwash caused by the virtual top/bottom sites. REMEMBER THAT THERE'RE HINT VIDEOS.
     /** 1st thought: Close virtualBottom after percolation, define a PERCOLATED
-     *  variable to indicate percolated or not. */
+     *  variable to indicate percolated or not.
+     *  Final solution: */
 
     /** Create an N-by-N grid, with all sites initially blocked */
     public Percolation(int N) {
@@ -27,6 +29,7 @@ public class Percolation {
         openSites[virtualTop] = 1;
         openSites[virtualBottom] = 1;
         this.numberOfOpenSites = 0;
+        this.percolated = false;
     }
 
     /** Open the site (row, col) if it is not open already */
@@ -41,7 +44,7 @@ public class Percolation {
         if (row == 0) {
             sites.union(xyTo1D(row, col), virtualTop);
         }
-        if (row == R - 1) {
+        if (row == R - 1 && !percolated) {
             sites.union(xyTo1D(row, col), virtualBottom);
         }
     }
@@ -50,12 +53,6 @@ public class Percolation {
     public boolean isOpen(int row, int col) {
         checkIndexOutOfBound(row, col);
         return openSites[xyTo1D(row, col)] == 1;
-    }
-
-    /** Returns whether the site is open */
-    public boolean isOpen(int x) {
-        checkIndexOutOfBound(x);
-        return openSites[x] == 1;
     }
 
     /** Returns whether the site is full */
@@ -70,7 +67,14 @@ public class Percolation {
 
     /** Returns whether the system percolates */
     public boolean percolates() {
-        return isConnected(virtualTop, virtualBottom);
+        if (percolated) {
+            return true;
+        }
+        if (isConnected(virtualTop, virtualBottom)) {
+            percolated = true;
+            return true;
+        }
+        return false;
     }
 
     /** Transforms the (x, y) 2-D representation of a site into a 1-D single number. */
