@@ -43,7 +43,7 @@ public class PercolationStats {
     }
 
     public static void main(String[] args) {
-        int trials = 400, gridSize = 600;
+        int trials = 300, gridSize = 600;
         PercolationStats ps = new PercolationStats(gridSize, trials);
         System.out.printf("Grid Size: %d x %d | Number of Trials: %d%n", gridSize, gridSize, trials);
         System.out.printf("The mean percolation threshold is %.4f%n", ps.mean());

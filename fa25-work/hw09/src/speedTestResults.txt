@@ -1,0 +1,7 @@
+Please enter desired length of each string: 20
+Enter # strings to insert into the maps: 9999999999999999999999999999999999999
+Please enter a positive integer: 12312
+class ULLMap: 0.36 sec
+class BSTMap: 0.01 sec
+Java's Built-in TreeMap: 0.01 sec
+Java's Built-in HashMap: 0.01 sec
