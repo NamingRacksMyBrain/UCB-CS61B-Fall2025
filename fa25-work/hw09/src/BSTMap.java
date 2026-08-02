@@ -41,6 +41,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         root = put(key, value, root);
     }
 
+    // Put the key-value pair, starting from Node N
     private Node put(K key, V value, Node n) {
         if (n == null) {
             size++;
@@ -69,6 +70,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         return get(key, root);
     }
 
+    // Get the value, starting from Node N
     private V get(K key, Node n) {
         if (n == null) {
             return null;
@@ -92,6 +94,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         return containsKey(key, root);
     }
 
+    // Returns whether contains KEY, starting from Node N
     private boolean containsKey(K key, Node n) {
         if (n == null) {
             return false;
