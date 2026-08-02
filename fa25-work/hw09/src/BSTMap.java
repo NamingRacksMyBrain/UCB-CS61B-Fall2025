@@ -1,5 +1,4 @@
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
@@ -16,8 +15,8 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
             this.right = right;
         }
 
-        private int compareNode(Node o) {
-            return this.key.compareTo(o.key);
+        boolean isLeaf() {
+            return this.left == null && this.right == null;
         }
     }
 
@@ -128,7 +127,11 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      */
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        Set<K> keySet = new TreeSet<>();
+        for (K key : this) {
+            keySet.add(key);
+        }
+        return keySet;
     }
 
     /**
@@ -141,16 +144,63 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      */
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     /**
-     * Returns an iterator over elements of type {@code T}.
+     * Returns an iterator over the keys, in sorted order.
      *
      * @return an Iterator.
      */
     @Override
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        return new BSTMapIter();
+    }
+
+    private class BSTMapIter implements Iterator<K> {
+
+        Deque<K> keys = new LinkedList<>();
+
+        // Add the keys of the tree starts at N to KEYS
+        void add(Node n) {
+            if (n == null) {
+            } else if (n.isLeaf()) {
+                keys.addLast(n.key);
+            } else {
+                add(n.left);
+                keys.addLast(n.key);
+                add(n.right);
+            }
+        }
+
+        BSTMapIter() {
+            add(root);
+        }
+
+        /**
+         * Returns {@code true} if the iteration has more elements.
+         * (In other words, returns {@code true} if {@link #next} would
+         * return an element rather than throwing an exception.)
+         *
+         * @return {@code true} if the iteration has more elements
+         */
+        @Override
+        public boolean hasNext() {
+            return !keys.isEmpty();
+        }
+
+        /**
+         * Returns the next element in the iteration.
+         *
+         * @return the next element in the iteration
+         * @throws NoSuchElementException if the iteration has no more elements
+         */
+        @Override
+        public K next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return keys.removeFirst();
+        }
     }
 }
