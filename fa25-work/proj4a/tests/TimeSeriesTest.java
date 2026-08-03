@@ -60,4 +60,33 @@ public class TimeSeriesTest {
         assertThat(totalPopulation.years()).isEmpty();
         assertThat(totalPopulation.data()).isEmpty();
     }
+
+    @Test
+    public void testDivisionBasic() {
+        TimeSeries catPopulation = new TimeSeries();
+        catPopulation.put(1992, 100.0);
+        catPopulation.put(1994, 200.0);
+
+        TimeSeries dogPopulation = new TimeSeries();
+        dogPopulation.put(1992, 50.0);
+        dogPopulation.put(1994, 400.0);
+
+        TimeSeries quotient = catPopulation.dividedBy(dogPopulation);
+        // expected: 1992: 2.0
+        //           1994: 0.5
+
+        List<Integer> expectedYears = new ArrayList<>();
+        expectedYears.add(1992);
+        expectedYears.add(1994);
+
+        assertThat(quotient.years()).isEqualTo(expectedYears);
+
+        List<Double> expectedQuotient = new ArrayList<>();
+        expectedQuotient.add(2.0);
+        expectedQuotient.add(0.5);
+
+        for (int i = 0; i < expectedQuotient.size(); i += 1) {
+            assertThat(quotient.data().get(i)).isWithin(1E-10).of(expectedQuotient.get(i));
+        }
+    }
 } 

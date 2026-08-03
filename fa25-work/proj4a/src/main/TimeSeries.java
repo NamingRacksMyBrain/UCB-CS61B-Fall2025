@@ -1,5 +1,7 @@
 package main;
 
+import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -29,16 +31,14 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      * inclusive of both end points.
      */
     public TimeSeries(TimeSeries ts, int startYear, int endYear) {
-        super();
-        // TODO: Fill in this constructor.
+        this.putAll(ts.subMap(startYear, true, endYear, true));
     }
 
     /**
      *  Returns all years for this time series in ascending order.
      */
     public List<Integer> years() {
-        // TODO: Fill in this method.
-        return null;
+        return new ArrayList<>(this.keySet());
     }
 
     /**
@@ -46,8 +46,7 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      *  order of years().
      */
     public List<Double> data() {
-        // TODO: Fill in this method.
-        return null;
+        return new ArrayList<>(this.values());
     }
 
     /**
@@ -60,8 +59,19 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      * should store the value from the TimeSeries that contains that year.
      */
     public TimeSeries plus(TimeSeries ts) {
-        // TODO: Fill in this method.
-        return null;
+        if (this.isEmpty() && ts.isEmpty()) {
+            return new TimeSeries();
+        }
+        TimeSeries sum = new TimeSeries();
+        sum.putAll(this);
+        for (int y : ts.keySet()) {
+            if (sum.containsKey(y)) {
+                sum.put(y, this.get(y) + ts.get(y));
+            } else {
+                sum.put(y, ts.get(y));
+            }
+        }
+        return sum;
     }
 
     /**
@@ -74,10 +84,18 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      * If TS has a year that is not in this TimeSeries, ignore it.
      */
     public TimeSeries dividedBy(TimeSeries ts) {
-        // TODO: Fill in this method.
-        return null;
+        if (this.isEmpty() && ts.isEmpty()) {
+            return null;
+        }
+        TimeSeries quotient = new TimeSeries();
+        quotient.putAll(this);
+        for (int y : ts.keySet()) {
+            if (quotient.containsKey(y)) {
+                quotient.put(y, (double) this.get(y) / ts.get(y));
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+        return quotient;
     }
-
-    // TODO: Add any private helper methods.
-    // TODO: Remove all TODO comments before submitting.
 }
