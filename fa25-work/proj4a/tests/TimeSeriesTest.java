@@ -89,4 +89,37 @@ public class TimeSeriesTest {
             assertThat(quotient.data().get(i)).isWithin(1E-10).of(expectedQuotient.get(i));
         }
     }
+
+    // By gemini
+    @Test
+    public void testDividedByException() {
+        TimeSeries ts1 = new TimeSeries();
+        ts1.put(2000, 50.0);
+        TimeSeries ts2 = new TimeSeries();
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> ts1.dividedBy(ts2)
+        );
+    }
+
+    @Test
+    public void testDividedByIgnoreExtraYears() {
+        TimeSeries ts1 = new TimeSeries();
+        ts1.put(2000, 50.0);
+
+        TimeSeries ts2 = new TimeSeries();
+        ts2.put(2000, 2.0);
+        ts2.put(2005, 999.0);
+
+        TimeSeries quotient = ts1.dividedBy(ts2);
+
+        List<Integer> expectedYears = new ArrayList<>();
+        expectedYears.add(2000);
+
+        assertThat(quotient.years()).isEqualTo(expectedYears);
+        assertThat(quotient.get(2000)).isWithin(1E-10).of(25.0);
+
+        assertThat(quotient.containsKey(2005)).isFalse();
+    }
 } 

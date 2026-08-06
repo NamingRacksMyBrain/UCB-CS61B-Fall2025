@@ -98,4 +98,34 @@ public class NGramMapTest {
         assertThat(fishPlusDogWeight.get(1865)).isWithin(1E-10).of(expectedFishPlusDogWeight1865);
     }
 
+    // By gemini
+    @Test
+    public void testSummedWeightHistoryNoRange() {
+        NGramMap ngm = new NGramMap(WORD_HISTORY_SIZE14377_FILE, YEAR_HISTORY_FILE);
+
+        List<String> words = new ArrayList<>();
+        words.add("fish");
+        words.add("dog");
+
+        TimeSeries sumWeight = ngm.summedWeightHistory(words);
+
+        double expected1865 = (136497.0 + 75819.0) / 2563919231.0;
+
+        assertThat(sumWeight.get(1865)).isWithin(1E-10).of(expected1865);
+    }
+
+    @Test
+    public void testMissingWord() {
+        NGramMap ngm = new NGramMap(WORD_HISTORY_SIZE4_FILE, YEAR_HISTORY_FILE);
+
+        String fakeWord = "joshhugisawesomeandilovecs61b!";
+
+        TimeSeries countResult = ngm.countHistory(fakeWord);
+        TimeSeries weightResult = ngm.weightHistory(fakeWord);
+        TimeSeries countResultWithRange = ngm.countHistory(fakeWord, 2000, 2010);
+
+        assertThat(countResult.years()).isEmpty();
+        assertThat(weightResult.years()).isEmpty();
+        assertThat(countResultWithRange.years()).isEmpty();
+    }
 }

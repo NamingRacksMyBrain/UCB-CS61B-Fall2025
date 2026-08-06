@@ -132,7 +132,7 @@ public class NGramMap {
         TimeSeries sum = new TimeSeries();
         for (String word : words) {
             if (wordHistory.containsKey(word)) {
-                sum.plus(wordHistory.get(word));
+                sum = sum.plus(wordHistory.get(word));
             }
         }
         return sum.dividedBy(yearHistory);

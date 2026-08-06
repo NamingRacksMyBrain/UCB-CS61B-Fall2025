@@ -29,7 +29,7 @@ public class PlotDemo {
         System.out.println(s);
 
         // you can also do this to display locally:
-        // Plotter.displayChart(chart);
+        Plotter.displayChart(chart);
 
     }
 }

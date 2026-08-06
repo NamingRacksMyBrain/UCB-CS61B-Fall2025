@@ -88,8 +88,8 @@ public class TimeSeries extends TreeMap<Integer, Double> {
         }
         TimeSeries quotient = new TimeSeries();
         quotient.putAll(this);
-        for (int y : ts.keySet()) {
-            if (quotient.containsKey(y)) {
+        for (int y : this.keySet()) {
+            if (ts.containsKey(y)) {
                 quotient.put(y, (double) this.get(y) / ts.get(y));
             } else {
                 throw new IllegalArgumentException();
