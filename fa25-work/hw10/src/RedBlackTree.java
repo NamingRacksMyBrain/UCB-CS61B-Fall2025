@@ -50,7 +50,16 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @param node
      */
     void flipColors(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
+        if (node.left.isBlack && node.right.isBlack && isRed(node)) {
+            node.isBlack = true;
+            node.left.isBlack = false;
+            node.right.isBlack = false;
+        }
+        else if (isRed(node.left) && isRed(node.right) && node.isBlack) {
+            node.isBlack = false;
+            node.left.isBlack = true;
+            node.right.isBlack = true;
+        }
     }
 
     /**
@@ -61,8 +70,11 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> targetRoot = node.left;
+        node.left = targetRoot.right;
+        targetRoot.right = node;
+        swapColor(node, targetRoot);
+        return targetRoot;
     }
 
     /**
@@ -73,10 +85,27 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> targetRoot = node.right;
+        node.right = targetRoot.left;
+        targetRoot.left = node;
+        swapColor(node, targetRoot);
+        return targetRoot;
     }
 
+    /**
+     * Swaps the color of node N1 and node N2.
+     * @param n1
+     * @param n2
+     */
+    private void swapColor(RBTreeNode<T> n1, RBTreeNode<T> n2) {
+        if (n1.isBlack) {
+            n1.isBlack = false;
+            n2.isBlack = true;
+        } else {
+            n2.isBlack = false;
+            n1.isBlack = true;
+        }
+    }
     /**
      * Helper method that returns whether the given node is red. Null nodes (children or leaf
      * nodes) are automatically considered black.
@@ -105,9 +134,19 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     private RBTreeNode<T> insertHelper(RBTreeNode<T> node, T item) {
-        // TODO: Insert (return) new red leaf node.
+        // Insert (return) new red leaf node.
+        if (node == null) {
+            return new RBTreeNode<>(false, item);
+        }
 
-        // TODO: Handle normal binary search tree insertion.
+        // Handle normal binary search tree insertion.
+        if (node.item.compareTo(item) > 0) {
+            insertHelper(node.left, item);
+        } else if (node.item.compareTo(item) < 0) {
+            insertHelper(node.right, item);
+        } else {
+            return node;
+        }
 
         // TODO: Rotate left operation
 
