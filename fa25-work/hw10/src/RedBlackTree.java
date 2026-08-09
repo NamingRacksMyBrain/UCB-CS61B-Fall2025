@@ -37,10 +37,6 @@ public class RedBlackTree<T extends Comparable<T>> {
             this.left = left;
             this.right = right;
         }
-
-        boolean isLeaf() {
-            return this.left == null && this.right == null;
-        }
     }
 
     /**
@@ -157,29 +153,21 @@ public class RedBlackTree<T extends Comparable<T>> {
             return node;
         }
 
-        /**
-         *  Deal with Invariant: If a node has one red child, it must be on the left.
-         *  Rotate left operation
-         */
-        if (!isRed(node.left) && isRed(node.right)) {
-            node = rotateLeft(node);
-        }
-
-        /**
-         *  Deal with Invariant: No red node can have a red parent (every red node’s parent is black)
-         *  Rotate right operation
-         */
+        // Rotate right operation
         if (isRed(node.left) && isRed(node.left.left)) {
             node = rotateRight(node);
         }
 
-        /**
-        *  Deal with Invariant: No node can have two red children
-        *  Color flip
-        */
+        // Rotate left operation
+        if (!isRed(node.left) && isRed(node.right)) {
+            node = rotateLeft(node);
+        }
+
+        // Color flip
         if (isRed(node.right) && isRed(node.left)) {
             flipColors(node);
         }
+
         return node;
     }
 }
