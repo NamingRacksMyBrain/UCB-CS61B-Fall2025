@@ -107,13 +107,9 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @param n2
      */
     private void swapColor(RBTreeNode<T> n1, RBTreeNode<T> n2) {
-        if (n1.isBlack) {
-            n1.isBlack = false;
-            n2.isBlack = true;
-        } else {
-            n2.isBlack = false;
-            n1.isBlack = true;
-        }
+        boolean tmp1 = n1.isBlack;
+        n1.isBlack = n2.isBlack;
+        n2.isBlack = tmp1;
     }
 
     /**
@@ -165,63 +161,25 @@ public class RedBlackTree<T extends Comparable<T>> {
          *  Deal with Invariant: If a node has one red child, it must be on the left.
          *  Rotate left operation
          */
-        if (item.compareTo(node.item) > 0 && (node.left == null || node.left.isBlack)) {
+        if (!isRed(node.left) && isRed(node.right)) {
             node = rotateLeft(node);
-        }
-
-        /**
-         *  Deal with Invariant: No node can have two red children
-         *  Color flip
-         */
-        if (item.compareTo(node.item) > 0 && isRed(node.left)) {
-            flipColors(node);
         }
 
         /**
          *  Deal with Invariant: No red node can have a red parent (every red node’s parent is black)
          *  Rotate right operation
          */
-        // Case 1: Two consecutive left-leaning red nodes.
-        if (node.isBlack && isRed(node.left) && isRed(node.left.left) && node.left.left.item == item) {
+        if (isRed(node.left) && isRed(node.left.left)) {
             node = rotateRight(node);
-            flipColors(node);
-        }
-        // Case 2: Red node with a right-leaning red child/node.
-        if (node.isBlack && isRed(node.left) && isRed(node.left.right) && node.left.right.item == item) {
-            node.left = rotateLeft(node.left);
-            node = rotateRight(node);
-            flipColors(node);
         }
 
-
+        /**
+        *  Deal with Invariant: No node can have two red children
+        *  Color flip
+        */
+        if (isRed(node.right) && isRed(node.left)) {
+            flipColors(node);
+        }
         return node;
     }
-    //
-    // // Returns the parent of a RBTreeNode
-    // public RBTreeNode<T> parent(RBTreeNode<T> child) {
-    //     if (child == root) {
-    //         return null;
-    //     }
-    //
-    //     RBTreeNode<T> pointer = root;
-    //
-    //     while (!pointer.isLeaf()) {
-    //         if (child.item.compareTo(pointer.item) > 0) {
-    //             if (pointer.right == child) {
-    //                 return pointer;
-    //             } else {
-    //                 pointer = pointer.right;
-    //             }
-    //         } else if (child.item.compareTo(pointer.item) < 0) {
-    //             if (pointer.left == child) {
-    //                 return pointer;
-    //             } else {
-    //                 pointer = pointer.left;
-    //             }
-    //         } else {
-    //             return null;
-    //         }
-    //     }
-    //     return pointer;
-    // }
 }
