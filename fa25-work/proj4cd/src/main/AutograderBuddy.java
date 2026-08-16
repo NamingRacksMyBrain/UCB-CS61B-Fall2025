@@ -1,6 +1,7 @@
 package main;
 
 import browser.NgordnetQueryHandler;
+import browser.NgordnetServer;
 
 
 public class AutograderBuddy {
@@ -9,6 +10,8 @@ public class AutograderBuddy {
             String wordHistoryFile, String yearHistoryFile,
             String synsetFile, String hyponymFile) {
 
-        throw new RuntimeException("Please fill out AutograderBuddy.java!");
+        WordNet wn = new WordNet(synsetFile, hyponymFile);
+
+        return new HyponymsHandler(wn);
     }
 }

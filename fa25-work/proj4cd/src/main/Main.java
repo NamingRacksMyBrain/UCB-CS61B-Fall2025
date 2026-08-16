@@ -14,7 +14,7 @@ public class Main {
     public static final String WORD_HISTORY_SIZE14377_FILE = PREFIX + "word_history_size14377.csv";
     public static final String YEAR_HISTORY_FILE = PREFIX + "year_history.csv";
 
-    /** Wordnet Files */
+    /** WordNet Files */
     private static final String SYNSETS_EECS_FILE = PREFIX + "synsets_eecs.txt";
     private static final String HYPONYMS_EECS_FILE = PREFIX + "hyponyms_eecs.txt";
     public static final String SYNSETS_SIZE16_FILE = PREFIX + "synsets_size16.txt";
@@ -28,12 +28,14 @@ public class Main {
     static {
         LoggerFactory.getLogger(Main.class).info("\033[1;38mChanging text color to white");
     }
+
     public static void main(String[] args) {
         NgordnetServer hns = new NgordnetServer();
 
+        WordNet wn = new WordNet(SYNSETS_SIZE82191_FILE, HYPONYMS_SIZE82191_FILE);
+
         hns.startUp();
-        // TODO: modify HyponymsHandler
-        // hns.register("hyponyms", new HyponymsHandler());
+        hns.register("hyponyms", new HyponymsHandler(wn));
 
         System.out.println("Finished server startup! Visit http://localhost:4567/ngordnet.html");
     }
