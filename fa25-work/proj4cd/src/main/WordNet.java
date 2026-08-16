@@ -21,7 +21,7 @@ public class WordNet {
     private final Map<Integer, Node> nodeMap = new HashMap<>(); // fake index -> node that contains synset
                                                                 // index is decided by the sequence of the node being added,
                                                                 // a.k.a decided by the input file
-    private final Map<Integer, Integer> fakeToReal = new HashMap<>(); // fake index -> real index
+    private final Map<Integer, Integer> realToFake = new HashMap<>(); // real index -> fake index
 
     /**
      * Constructs a WordNet from SYNSETSFILENAME and HYPONYMSFILENAME.
@@ -39,7 +39,7 @@ public class WordNet {
             Node theNode = new Node(realIndex, synonyms);
 
             nodeMap.put(count, theNode);
-            fakeToReal.put(realIndex, count);
+            realToFake.put(realIndex, count);
 
             for (String word : synonyms) {
                 if (!wordMap.containsKey(word)) {
@@ -62,7 +62,7 @@ public class WordNet {
             String[] splitLine = nextLine.split(",");
 
             for (int i = 1; i < splitLine.length; i++) {
-                wordGraph.addEdge(fakeToReal.get(Integer.parseInt(splitLine[0])), fakeToReal.get(Integer.parseInt(splitLine[i])));
+                wordGraph.addEdge(realToFake.get(Integer.parseInt(splitLine[0])), realToFake.get(Integer.parseInt(splitLine[i])));
             }
         }
     }
