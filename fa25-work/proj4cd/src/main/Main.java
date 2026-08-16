@@ -17,8 +17,8 @@ public class Main {
     /** WordNet Files */
     private static final String SYNSETS_EECS_FILE = PREFIX + "synsets_eecs.txt";
     private static final String HYPONYMS_EECS_FILE = PREFIX + "hyponyms_eecs.txt";
-    public static final String SYNSETS_SIZE16_FILE = PREFIX + "synsets_size16.txt";
-    public static final String HYPONYMS_SIZE16_FILE = PREFIX + "hyponyms_size16.txt";
+    public static final String SYNSETS_SIZE10_FILE = PREFIX + "synsets_size10.txt";
+    public static final String HYPONYMS_SIZE10_FILE = PREFIX + "hyponyms_size10.txt";
     public static final String SYNSETS_SIZE1000_FILE = PREFIX + "synsets_size1000.txt";
     public static final String HYPONYMS_SIZE1000_FILE = PREFIX +  "hyponyms_size1000.txt";
     public static final String SYNSETS_SIZE82191_FILE = PREFIX + "synsets_size82191.txt";
@@ -32,7 +32,7 @@ public class Main {
     public static void main(String[] args) {
         NgordnetServer hns = new NgordnetServer();
 
-        WordNet wn = new WordNet(SYNSETS_SIZE82191_FILE, HYPONYMS_SIZE82191_FILE);
+        WordNet wn = new WordNet(SYNSETS_SIZE10_FILE, HYPONYMS_SIZE10_FILE);
 
         hns.startUp();
         hns.register("hyponyms", new HyponymsHandler(wn));

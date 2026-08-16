@@ -6,15 +6,22 @@ import java.util.*;
 
 public class WordNet {
 
-
     private class Node {
-        private int index;
+        private int realIndex;
         private String[] synset;
+
+        Node(int i, String[] synset) {
+            this.realIndex = i;
+            this.synset = synset;
+        }
     }
 
-    private final Map<String, List<Integer>> wordMap = new HashMap<>(); // 1 word -> indices of synsets that contain it
-    private final Graph wordGraph; // graph of all indices
-    private final Map<Integer, String[]> synsetMap = new HashMap<>(); // 1 to 1 mapping: index -> synset
+    private final Map<String, List<Integer>> wordMap = new HashMap<>(); // 1 word -> fake indices
+    private final Graph wordGraph; // graph of all fake indices
+    private final Map<Integer, Node> nodeMap = new HashMap<>(); // fake index -> node that contains synset
+                                                                // index is decided by the sequence of the node being added,
+                                                                // a.k.a decided by the input file
+    private final Map<Integer, Integer> fakeToReal = new HashMap<>(); // fake index -> real index
 
     /**
      * Constructs a WordNet from SYNSETSFILENAME and HYPONYMSFILENAME.
@@ -27,18 +34,20 @@ public class WordNet {
             String nextLine = inSynsets.readLine();
             String[] splitLine = nextLine.split(",");
 
-            int index = Integer.parseInt(splitLine[0]);
             String[] synonyms = splitLine[1].split(" ");
+            int realIndex = Integer.parseInt(splitLine[0]);
+            Node theNode = new Node(realIndex, synonyms);
 
-            synsetMap.put(index, synonyms);
+            nodeMap.put(count, theNode);
+            fakeToReal.put(realIndex, count);
 
             for (String word : synonyms) {
                 if (!wordMap.containsKey(word)) {
                     List<Integer> indices = new ArrayList<>();
-                    indices.add(index);
+                    indices.add(count);
                     wordMap.put(word, indices);
                 } else {
-                    wordMap.get(word).add(index);
+                    wordMap.get(word).add(count);
                 }
             }
 
@@ -53,7 +62,7 @@ public class WordNet {
             String[] splitLine = nextLine.split(",");
 
             for (int i = 1; i < splitLine.length; i++) {
-                wordGraph.addEdge(Integer.parseInt(splitLine[0]), Integer.parseInt(splitLine[i]));
+                wordGraph.addEdge(fakeToReal.get(Integer.parseInt(splitLine[0])), fakeToReal.get(Integer.parseInt(splitLine[i])));
             }
         }
     }
@@ -70,7 +79,7 @@ public class WordNet {
 
         Set<String> hyponyms = new TreeSet<>();
         for (int j : reachable) {
-            hyponyms.addAll(Arrays.asList(synsetMap.get(j)));
+            hyponyms.addAll(Arrays.asList(nodeMap.get(j).synset));
         }
         return hyponyms; // TreeSet is supposed to be sorted naturally
     }
