@@ -4,6 +4,7 @@ import main.TimeSeries;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
+import org.knowm.xchart.style.Styler;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -33,6 +34,17 @@ public class Plotter {
         return chart;
     }
 
+    public static XYChart generateCustomXYChart(String title, String seriesName, List<Double> xData, List<Double> yData, boolean logScale) {
+        XYChart chart = new XYChart(WIDTH, HEIGHT);
+        chart.setTitle(title);
+        if (logScale) {
+            chart.getStyler().setXAxisLogarithmic(true);
+            chart.getStyler().setYAxisLogarithmic(true);
+        }
+        chart.addSeries(seriesName, xData, yData);
+        return chart;
+    }
+
     public static void displayChart(XYChart chart) {
         new SwingWrapper(chart).displayChart();
     }
@@ -47,7 +59,6 @@ public class Plotter {
             e.printStackTrace();
         }
 
-        String encodedImage = Base64.getEncoder().encodeToString(os.toByteArray());
-        return encodedImage;
+        return Base64.getEncoder().encodeToString(os.toByteArray());
     }
 }

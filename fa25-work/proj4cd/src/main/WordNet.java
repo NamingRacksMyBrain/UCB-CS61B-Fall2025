@@ -1,7 +1,6 @@
 package main;
 
 import edu.princeton.cs.algs4.In;
-
 import java.util.*;
 
 public class WordNet {
@@ -16,14 +15,11 @@ public class WordNet {
         }
     }
 
-    private final Map<String, List<Integer>> wordMap = new HashMap<>(); // 1 word -> fake indices
-    private final Graph wordGraph; // graph of all fake indices
-    private final Map<Integer, Node> nodeMap = new HashMap<>(); // fake index -> node that contains synset
-    private final Map<Integer, Integer> realToFake = new HashMap<>(); // real index -> fake index
+    private final Map<String, List<Integer>> wordMap = new HashMap<>();
+    private final Graph wordGraph;
+    private final Map<Integer, Node> nodeMap = new HashMap<>();
+    private final Map<Integer, Integer> realToFake = new HashMap<>();
 
-    /**
-     * Constructs a WordNet from SYNSETSFILENAME and HYPONYMSFILENAME.
-     */
     public WordNet(String synsetsFileName, String hyponymsFileName) {
         int count = 0;
 
@@ -48,7 +44,6 @@ public class WordNet {
                     wordMap.get(word).add(count);
                 }
             }
-
             count++;
         }
 
@@ -69,12 +64,10 @@ public class WordNet {
         if (!wordMap.containsKey(word)) {
             return new TreeSet<>();
         }
-
         Set<Integer> reachable = new TreeSet<>();
         for (int i : wordMap.get(word)) {
             reachable.addAll(wordGraph.reachable(i));
         }
-
         Set<String> hyponyms = new TreeSet<>();
         for (int j : reachable) {
             hyponyms.addAll(Arrays.asList(nodeMap.get(j).synset));
@@ -86,16 +79,37 @@ public class WordNet {
         if (!wordMap.containsKey(word)) {
             return new TreeSet<>();
         }
-
         Set<Integer> reachable = new TreeSet<>();
         for (int i : wordMap.get(word)) {
             reachable.addAll(wordGraph.reverseReachable(i));
         }
-
         Set<String> ancestors = new TreeSet<>();
         for (int j : reachable) {
             ancestors.addAll(Arrays.asList(nodeMap.get(j).synset));
         }
         return ancestors;
+    }
+
+    public String shortestPath(String word1, String word2) {
+        if (!wordMap.containsKey(word1) || !wordMap.containsKey(word2)) {
+            return "One or both words not found in WordNet.";
+        }
+        Set<Integer> starts = new HashSet<>(wordMap.get(word1));
+        Set<Integer> targets = new HashSet<>(wordMap.get(word2));
+
+        List<Integer> path = wordGraph.shortestPath(starts, targets);
+        if (path.isEmpty()) {
+            return "No semantic path found between " + word1 + " and " + word2;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Shortest Path (Distance = ").append(path.size() - 1).append("):\n\n");
+        for (int i = 0; i < path.size(); i++) {
+            sb.append("[").append(String.join(", ", nodeMap.get(path.get(i)).synset)).append("]");
+            if (i < path.size() - 1) {
+                sb.append("\n  ↕\n");
+            }
+        }
+        return sb.toString();
     }
 }

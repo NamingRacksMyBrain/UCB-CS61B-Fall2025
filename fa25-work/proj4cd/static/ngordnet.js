@@ -1,20 +1,8 @@
 $(function() {
-    plot = document.getElementById('plot');
-    textresult = document.getElementById('textresult');
+    var plot = document.getElementById('plot');
+    var textresult = document.getElementById('textresult');
 
-    var host;
-
-    //console.log(document.location.hostname);
-    /* Set server URIs */
-    /*if (document.location.hostname !== 'localhost') {
-        host = 'http://' + document.location.host;
-    } else {
-        host = 'http://localhost:4567';
-    }
-
-    console.log(host);*/
-
-    host = 'http://localhost:4567';
+    var host = 'http://localhost:4567';
     const history_server = host + '/history';
     const historytext_server = host + '/historytext';
     const hyponyms_server = host + '/hyponyms';
@@ -22,14 +10,17 @@ $(function() {
     const hypohisttext_server = host + '/hypohisttext';
     const commonancestors_server = host + '/ancestors';
 
-    var ngordnetQueryType = "HYPONYMS";
+    const shortestpath_server = host + '/shortestpath';
+    const zipf_server = host + '/zipf';
+    const wordlength_server = host + '/wordlength';
+    const trending_server = host + '/trending';
+
     function get_params() {
         return {
             words: document.getElementById('words').value,
             startYear: document.getElementById('start').value,
             endYear: document.getElementById('end').value,
-            k: document.getElementById('k').value,
-            ngordnetQueryType: ngordnetQueryType
+            k: document.getElementById('k').value
         }
     }
 
@@ -40,152 +31,54 @@ $(function() {
     $('#hypohisttext').click(hypohistTextButton);
     $('#commonancestors').click(commonAncestorsButton);
 
-    function historyButton() {
+    $('#shortestpath').click(shortestPathButton);
+    $('#zipf').click(zipfButton);
+    $('#wordlength').click(wordLengthButton);
+    $('#trending').click(trendingButton);
+
+    function displayPlot(url) {
         $("#textresult").hide();
         $("#plot").show();
-
-        var params = get_params();
-        console.log(params);
         $.get({
             async: false,
-            url: history_server,
-            data: params,
+            url: url,
+            data: get_params(),
             success: function(data) {
-                console.log(data)
-
-                plot.src = 'data:image/png;base64,' + data;
-
-            },
-            error: function(data) {
-                console.log("error")
-                console.log(data);
                 plot.src = 'data:image/png;base64,' + data;
             },
+            error: function(data) {
+                console.log("error", data);
+            },
             dataType: 'json'
         });
     }
 
-    function historyTextButton() {
-        console.log("history text call");
+    function displayText(url) {
         $("#plot").hide();
         $("#textresult").show();
-
-        var params = get_params();
-        console.log(params);
         $.get({
             async: false,
-            url: historytext_server,
-            data: params,
+            url: url,
+            data: get_params(),
             success: function(data) {
-                console.log(data)
-
-                textresult.value = data;
-
-            },
-            error: function(data) {
-                console.log("error")
-                console.log(data);
-            },
-            dataType: 'json'
-        });
-    }
-
-    function hyponymsButton() {
-        console.log("hyponyms call");
-        $("#plot").hide();
-        $("#textresult").show();
-        ngordnetQueryType = "HYPONYMS";
-        var params = get_params();
-        console.log(params);
-        $.get({
-            async: false,
-            url: hyponyms_server,
-            data: params,
-            success: function(data) {
-                console.log(data)
-
-                textresult.value = data;
-
-            },
-            error: function(data) {
-                console.log("error")
-                console.log(data);
-            },
-            dataType: 'json'
-        });
-    }
-
-    function hypohistButton() {
-        console.log("hypohist call");
-        $("#textresult").hide();
-        $("#plot").show();
-        ngordnetQueryType = "HYPOHIST";
-        var params = get_params();
-        console.log(params);
-        $.get({
-            async: false,
-            url: hypohist_server,
-            data: params,
-            success: function(data) {
-                console.log(data)
-
-                plot.src = 'data:image/png;base64,' + data;
-
-            },
-            error: function(data) {
-                console.log("error")
-                console.log(data);
-                plot.src = 'data:image/png;base64,' + data;
-            },
-            dataType: 'json'
-        });
-    }
-
-    function hypohistTextButton() {
-        console.log("hypohist text call");
-        $("#plot").hide();
-        $("#textresult").show();
-
-        var params = get_params();
-        console.log(params);
-        $.get({
-            async: false,
-            url: hypohisttext_server,
-            data: params,
-            success: function(data) {
-                console.log(data)
-
-                textresult.value = data;
-
-            },
-            error: function(data) {
-                console.log("error")
-                console.log(data);
-            },
-            dataType: 'json'
-        });
-    }
-
-    function commonAncestorsButton() {
-        console.log("common ancestors call");
-        $("#plot").hide();
-        $("#textresult").show();
-        ngordnetQueryType = "ANCESTORS";
-        var params = get_params();
-        console.log(params);
-        $.get({
-            async: false,
-            url: commonancestors_server,
-            data: params,
-            success: function(data) {
-                console.log(data);
                 textresult.value = data;
             },
             error: function(data) {
-                console.log("error");
-                console.log(data);
+                console.log("error", data);
             },
             dataType: 'json'
         });
     }
+
+    function historyButton() { displayPlot(history_server); }
+    function historyTextButton() { displayText(historytext_server); }
+    function hyponymsButton() { displayText(hyponyms_server); }
+    function hypohistButton() { displayPlot(hypohist_server); }
+    function hypohistTextButton() { displayText(hypohisttext_server); }
+    function commonAncestorsButton() { displayText(commonancestors_server); }
+
+    function shortestPathButton() { displayText(shortestpath_server); }
+    function zipfButton() { displayPlot(zipf_server); }
+    function wordLengthButton() { displayPlot(wordlength_server); }
+    function trendingButton() { displayText(trending_server); }
 });

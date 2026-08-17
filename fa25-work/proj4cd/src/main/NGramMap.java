@@ -1,27 +1,13 @@
 package main;
 
 import edu.princeton.cs.algs4.In;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
-/**
- * An object that provides utility methods for making queries on the
- * Google NGrams dataset (or a subset thereof).
- *
- * An NGramMap stores pertinent data from a "words file" and a "counts
- * file". It is not a map in the strict sense, but it does provide additional
- * functionality.
- *
- * @author Josh Hug
- */
 public class NGramMap {
 
     private TimeSeries yearHistory = new TimeSeries();
     private HashMap<String, TimeSeries> wordHistory = new HashMap<>();
 
-    /**
-     * Constructs an NGramMap from WORDHISTORYFILENAME and YEARHISTORYFILENAME.
-     */
     public NGramMap(String wordHistoryFilename, String yearHistoryFilename) {
         In inYearHistory = new In(yearHistoryFilename);
         while (!inYearHistory.isEmpty()) {
@@ -45,13 +31,6 @@ public class NGramMap {
         }
     }
 
-    /**
-     * Provides the history of WORD between STARTYEAR and ENDYEAR, inclusive of both ends. The
-     * returned TimeSeries should be a copy, not a link to this NGramMap's TimeSeries. In other
-     * words, changes made to the object returned by this function should not also affect the
-     * NGramMap. This is also known as a "defensive copy". If the word is not in the data files,
-     * returns an empty TimeSeries.
-     */
     public TimeSeries countHistory(String word, int startYear, int endYear) {
         if (!wordHistory.containsKey(word)) {
             return new TimeSeries();
@@ -59,12 +38,6 @@ public class NGramMap {
         return new TimeSeries(wordHistory.get(word), startYear, endYear);
     }
 
-    /**
-     * Provides the history of WORD. The returned TimeSeries should be a copy, not a link to this
-     * NGramMap's TimeSeries. In other words, changes made to the object returned by this function
-     * should not also affect the NGramMap. This is also known as a "defensive copy". If the word
-     * is not in the data files, returns an empty TimeSeries.
-     */
     public TimeSeries countHistory(String word) {
         if (!wordHistory.containsKey(word)) {
             return new TimeSeries();
@@ -72,18 +45,10 @@ public class NGramMap {
         return new TimeSeries(wordHistory.get(word), TimeSeries.MIN_YEAR, TimeSeries.MAX_YEAR);
     }
 
-    /**
-     * Returns a defensive copy of the total number of words recorded per year in all volumes.
-     */
     public TimeSeries totalCountHistory() {
         return new TimeSeries(yearHistory, TimeSeries.MIN_YEAR, TimeSeries.MAX_YEAR);
     }
 
-    /**
-     * Provides a TimeSeries containing the relative frequency per year of WORD between STARTYEAR
-     * and ENDYEAR, inclusive of both ends. If the word is not in the data files, returns an empty
-     * TimeSeries.
-     */
     public TimeSeries weightHistory(String word, int startYear, int endYear) {
         if (!wordHistory.containsKey(word)) {
             return new TimeSeries();
@@ -93,11 +58,6 @@ public class NGramMap {
         return theWord.dividedBy(theYear);
     }
 
-    /**
-     * Provides a TimeSeries containing the relative frequency per year of WORD compared to all
-     * words recorded in that year. If the word is not in the data files, returns an empty
-     * TimeSeries.
-     */
     public TimeSeries weightHistory(String word) {
         if (!wordHistory.containsKey(word)) {
             return new TimeSeries();
@@ -106,35 +66,37 @@ public class NGramMap {
         return theWord.dividedBy(yearHistory);
     }
 
-    /**
-     * Provides the summed relative frequency per year of all words in WORDS between STARTYEAR and
-     * ENDYEAR, inclusive of both ends. If a word does not exist in this time frame, ignore it
-     * rather than throwing an exception.
-     */
-    public TimeSeries summedWeightHistory(Collection<String> words,
-                                          int startYear, int endYear) {
-        TimeSeries sum = new TimeSeries();
-        for (String word : words) {
-            if (wordHistory.containsKey(word)) {
-                TimeSeries theWord = new TimeSeries(wordHistory.get(word), startYear, endYear);
-                sum = sum.plus(theWord);
+    public TimeSeries averageWordLengthHistory(int startYear, int endYear) {
+        TimeSeries avgLengths = new TimeSeries();
+        for (int y = startYear; y <= endYear; y++) {
+            if (!yearHistory.containsKey(y) || yearHistory.get(y) == 0.0) {
+                continue;
+            }
+            double totalChars = 0.0;
+            double totalWords = 0.0;
+            for (Map.Entry<String, TimeSeries> entry : wordHistory.entrySet()) {
+                TimeSeries ts = entry.getValue();
+                if (ts.containsKey(y)) {
+                    double count = ts.get(y);
+                    totalChars += count * entry.getKey().length();
+                    totalWords += count;
+                }
+            }
+            if (totalWords > 0) {
+                avgLengths.put(y, totalChars / totalWords);
             }
         }
-        TimeSeries theYear = new TimeSeries(yearHistory, startYear, endYear);
-        return sum.dividedBy(theYear);
+        return avgLengths;
     }
 
-    /**
-     * Returns the summed relative frequency per year of all words in WORDS. If a word does not
-     * exist in this time frame, ignore it rather than throwing an exception.
-     */
-    public TimeSeries summedWeightHistory(Collection<String> words) {
-        TimeSeries sum = new TimeSeries();
-        for (String word : words) {
-            if (wordHistory.containsKey(word)) {
-                sum = sum.plus(wordHistory.get(word));
+    public List<Double> getSortedCountsForYear(int year) {
+        List<Double> counts = new ArrayList<>();
+        for (TimeSeries ts : wordHistory.values()) {
+            if (ts.containsKey(year) && ts.get(year) > 0) {
+                counts.add(ts.get(year));
             }
         }
-        return sum.dividedBy(yearHistory);
+        counts.sort(Collections.reverseOrder());
+        return counts;
     }
 }
