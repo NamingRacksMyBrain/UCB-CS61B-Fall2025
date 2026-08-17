@@ -19,8 +19,6 @@ public class WordNet {
     private final Map<String, List<Integer>> wordMap = new HashMap<>(); // 1 word -> fake indices
     private final Graph wordGraph; // graph of all fake indices
     private final Map<Integer, Node> nodeMap = new HashMap<>(); // fake index -> node that contains synset
-                                                                // index is decided by the sequence of the node being added,
-                                                                // a.k.a decided by the input file
     private final Map<Integer, Integer> realToFake = new HashMap<>(); // real index -> fake index
 
     /**
@@ -81,6 +79,23 @@ public class WordNet {
         for (int j : reachable) {
             hyponyms.addAll(Arrays.asList(nodeMap.get(j).synset));
         }
-        return hyponyms; // TreeSet is supposed to be sorted naturally
+        return hyponyms;
+    }
+
+    public Set<String> ancestors(String word) {
+        if (!wordMap.containsKey(word)) {
+            return new TreeSet<>();
+        }
+
+        Set<Integer> reachable = new TreeSet<>();
+        for (int i : wordMap.get(word)) {
+            reachable.addAll(wordGraph.reverseReachable(i));
+        }
+
+        Set<String> ancestors = new TreeSet<>();
+        for (int j : reachable) {
+            ancestors.addAll(Arrays.asList(nodeMap.get(j).synset));
+        }
+        return ancestors;
     }
 }

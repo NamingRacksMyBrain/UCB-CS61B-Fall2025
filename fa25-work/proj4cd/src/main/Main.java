@@ -24,7 +24,6 @@ public class Main {
     public static final String SYNSETS_SIZE82191_FILE = PREFIX + "synsets_size82191.txt";
     public static final String HYPONYMS_SIZE82191_FILE = PREFIX +  "hyponyms_size82191.txt";
 
-
     static {
         LoggerFactory.getLogger(Main.class).info("\033[1;38mChanging text color to white");
     }
@@ -40,6 +39,8 @@ public class Main {
         hns.register("historytext", new HistoryTextHandler(ngm));
         hns.register("hyponyms", new HyponymsHandler(wn, ngm));
         hns.register("hypohist", new HypohistHandler(wn, ngm));
+        hns.register("hypohisttext", new HypohistTextHandler(wn, ngm));
+        hns.register("ancestors", new AncestorsHandler(wn));
 
         System.out.println("Finished server startup! Visit http://localhost:4567/ngordnet.html");
     }

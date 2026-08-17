@@ -175,16 +175,14 @@ $(function() {
         console.log(params);
         $.get({
             async: false,
-            url: hyponyms_server,
+            url: commonancestors_server,
             data: params,
             success: function(data) {
-                console.log(data)
-
+                console.log(data);
                 textresult.value = data;
-
             },
             error: function(data) {
-                console.log("error")
+                console.log("error");
                 console.log(data);
             },
             dataType: 'json'
