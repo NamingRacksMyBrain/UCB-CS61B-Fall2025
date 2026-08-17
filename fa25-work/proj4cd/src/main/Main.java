@@ -32,10 +32,11 @@ public class Main {
     public static void main(String[] args) {
         NgordnetServer hns = new NgordnetServer();
 
-        WordNet wn = new WordNet(SYNSETS_SIZE10_FILE, HYPONYMS_SIZE10_FILE);
+        WordNet wn = new WordNet(SYNSETS_SIZE82191_FILE, HYPONYMS_SIZE82191_FILE);
+        NGramMap ngm = new NGramMap(WORD_HISTORY_SIZE14377_FILE, YEAR_HISTORY_FILE);
 
         hns.startUp();
-        hns.register("hyponyms", new HyponymsHandler(wn));
+        hns.register("hyponyms", new HyponymsHandler(wn, ngm));
 
         System.out.println("Finished server startup! Visit http://localhost:4567/ngordnet.html");
     }
