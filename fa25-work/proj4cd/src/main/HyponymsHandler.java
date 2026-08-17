@@ -2,13 +2,10 @@ package main;
 
 import browser.NgordnetQuery;
 import browser.NgordnetQueryHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class HyponymsHandler extends NgordnetQueryHandler {
-    private static final Logger log = LoggerFactory.getLogger(HyponymsHandler.class);
     private WordNet wn;
     private NGramMap ngm;
 
@@ -19,6 +16,10 @@ public class HyponymsHandler extends NgordnetQueryHandler {
 
     @Override
     public String handle(NgordnetQuery q) {
+        return handleReturnSet(q, this.wn, this.ngm).toString();
+    }
+
+    public static Set<String> handleReturnSet(NgordnetQuery q, WordNet wn, NGramMap ngm) {
         List<String> words = q.words();
 
         List<Set<String>> multiSets = new ArrayList<>();
@@ -28,7 +29,7 @@ public class HyponymsHandler extends NgordnetQueryHandler {
         Set<String> intersection = SetIntersection.intersect(multiSets);
 
         if (q.k() == 0) {
-            return intersection.toString();
+            return intersection;
         } else {
             int startYear = q.startYear();
             int endYear = q.endYear();
@@ -54,7 +55,7 @@ public class HyponymsHandler extends NgordnetQueryHandler {
             for (wordNode n : maxHeap) {
                 topWords.add(n.word);
             }
-            return topWords.toString();
+            return topWords;
         }
     }
 
