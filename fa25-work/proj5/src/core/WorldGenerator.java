@@ -129,7 +129,7 @@ public class WorldGenerator {
 
     /** Connect Rooms A and B Vertically if possible.
      *  Return true to indicate success. */
-    private boolean connectRoomsVertical(Room a, Room b) {
+    private boolean tryConnectRoomsVertical(Room a, Room b) {
         int leftA = a.bottomLeft().x();
         int rightA = a.bottomRight().x();
         int leftB = b.bottomLeft().x();
