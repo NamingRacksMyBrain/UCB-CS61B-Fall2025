@@ -4,6 +4,8 @@ This repo contains my solutions to homeworks, projects, and slides for UC Berkel
 
 - [CS61B Official Website](https://fa25.datastructur.es/)
   
-- Time I spent: 2026.6.28 ~ 
+- Time I spent: 2026.6.28 ~ 2026.9.5
+- TODO:
+  Project5C BYOW: Interactivity
 
 > **Note**: My solutions are intended for academic reference and personal review only. If you are a current student, please follow academic policies. 
