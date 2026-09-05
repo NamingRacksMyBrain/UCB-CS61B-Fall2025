@@ -17,7 +17,7 @@ public class Room {
     public Position getCenter() {
         int xOffset = width / 2;
         int yOffset = height / 2;
-        return new Position(bottomLeft.x + xOffset, bottomLeft.y + yOffset);
+        return new Position(bottomLeft.x() + xOffset, bottomLeft.y() + yOffset);
     }
 
     public boolean isOutOfBounds(int worldWidth, int worldHeight) {
@@ -28,18 +28,30 @@ public class Room {
     }
 
     public boolean isOverlapping(List<Room> rooms) {
+        int myLeft = this.bottomLeft().x() - 1;
+        int myRight = this.bottomRight().x() + 1;
+        int myBottom = this.bottomLeft().y() - 1;
+        int myTop = this.topLeft().y() + 1;
+
         for (Room other : rooms) {
-            if ((other.containsGrid(bottomLeft) || other.containsGrid(bottomRight())
-               || other.containsGrid(topLeft()) || other.containsGrid(topRight()))) {
+            int otherLeft = other.bottomLeft().x();
+            int otherRight = other.bottomRight().x();
+            int otherBottom = other.bottomLeft().y();
+            int otherTop = other.topLeft().y();
+
+            if (myLeft <= otherRight && myRight >= otherLeft && myBottom <= otherTop && myTop >= otherBottom) {
                 return true;
             }
         }
-
         return false;
     }
 
     private boolean containsGrid(Position p) {
-        return p.x >= bottomLeft.x && p.x < bottomLeft.x + width && p.y >= bottomLeft.y && p.y < bottomLeft.y + height;
+        return p.x() >= bottomLeft.x() && p.x() < bottomLeft.x() + width && p.y() >= bottomLeft.y() && p.y() < bottomLeft.y() + height;
+    }
+
+    public int distanceTo(Room other) {
+        return Math.abs(bottomLeft.x() - other.bottomLeft.x()) + Math.abs(bottomLeft.y() - other.bottomLeft.y());
     }
 
     public int width() {
@@ -55,14 +67,14 @@ public class Room {
     }
 
     public Position bottomRight() {
-        return new Position(bottomLeft.x + width - 1, bottomLeft.y);
+        return new Position(bottomLeft.x() + width - 1, bottomLeft.y());
     }
 
     public Position topLeft() {
-        return new Position(bottomLeft.x, bottomLeft.y + height - 1);
+        return new Position(bottomLeft.x(), bottomLeft.y() + height - 1);
     }
 
     public Position topRight() {
-        return new Position(bottomLeft.x + width - 1, bottomLeft.y + height - 1);
+        return new Position(bottomLeft.x() + width - 1, bottomLeft.y() + height - 1);
     }
 }

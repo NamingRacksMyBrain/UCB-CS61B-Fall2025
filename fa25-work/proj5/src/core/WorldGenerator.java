@@ -1,13 +1,10 @@
 package core;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.List;
+import java.util.*;
 
-import tileengine.TERenderer;
+import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 import tileengine.TETile;
 import tileengine.Tileset;
 
-import static utils.RandomUtils.gaussian;
 import static utils.RandomUtils.uniform;
 
 public class WorldGenerator {
@@ -28,19 +25,12 @@ public class WorldGenerator {
         this.world = new TETile[WIDTH][HEIGHT];
     }
 
-        public World generate() {
+    public TETile[][] generate() {
         fillWithNothing();
         generateAllRooms();
         connectAllRooms();
         buildWalls();
-
-        World myWorld = new World(world);
-
-        Position startPos = rooms.get(0).getCenter();
-        myWorld.setAvatarPosition(startPos);
-        world[startPos.x][startPos.y] = Tileset.AVATAR;
-
-        return myWorld;
+        return this.world;
     }
 
     private void fillWithNothing() {
@@ -52,14 +42,14 @@ public class WorldGenerator {
     }
 
     private void generateAllRooms() {
-        int roomCount = uniform(RANDOM, 20, 26);  // 20 ~ 25
+        int roomCount = uniform(RANDOM, (HEIGHT * WIDTH) / 210, (HEIGHT * WIDTH) / 150);
 
         for (int i = 0; i < roomCount; i++) {
             int roomX = uniform(RANDOM, 1, WIDTH - 2);  // 1 ~ WIDTH - 3
             int roomY = uniform(RANDOM, 1, HEIGHT - 1); // 1 ~ HEIGHT - 2
 
-            int roomWidth = uniform(RANDOM, 2, 10);
-            int roomHeight = uniform(RANDOM, 2, 10);
+            int roomWidth = uniform(RANDOM, 3, (WIDTH + HEIGHT) / 10);
+            int roomHeight = uniform(RANDOM, 3, (WIDTH + HEIGHT) / 10);
 
             Room newRoom = new Room(new Position(roomX, roomY), roomWidth, roomHeight);
 
@@ -80,14 +70,56 @@ public class WorldGenerator {
 
         for (int xOffset = 0; xOffset < width; xOffset++) {
             for (int yOffset = 0; yOffset < height; yOffset++) {
-                world[bottomLeft.x + xOffset][bottomLeft.y + yOffset] = Tileset.FLOOR;
+                world[bottomLeft.x() + xOffset][bottomLeft.y() + yOffset] = Tileset.FLOOR;
             }
         }
     }
 
     private void connectAllRooms() {
-        for (int i = 0; i < rooms.size() - 1; i++) {
-            connectRooms(rooms.get(i), rooms.get(i + 1));
+        int n = rooms.size();
+
+        // Map each room to a number
+        HashMap<Room, Integer> roomsMap = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            roomsMap.put(rooms.get(i), i);
+        }
+
+        int edgeCount = n - 1;
+        int totalEdges = (n * (n - 1)) / 2;
+
+        // Add all edges to the priority queue
+        PriorityQueue<Edge> edges = new PriorityQueue<>(totalEdges);
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = i + 1; j < n; j++){
+                edges.add(new Edge(rooms.get(i), rooms.get(j)));
+            }
+        }
+
+        WeightedQuickUnionUF roomDisjointSet = new WeightedQuickUnionUF(n);
+        ArrayList<Edge> shortestEdges = new ArrayList<>();
+
+        int validEdgeCount = 0;
+
+        while (!edges.isEmpty()) {
+            if (validEdgeCount == edgeCount) {
+                break;
+            }
+
+            Edge e = edges.poll(); // get and delete the shortest edge
+
+            int indexOfRoomA = roomsMap.get(e.a());
+            int indexOfRoomB = roomsMap.get(e.b());
+
+            // If two rooms are not connected
+            if (roomDisjointSet.find(indexOfRoomA) != roomDisjointSet.find(indexOfRoomB)) {
+                roomDisjointSet.union(indexOfRoomA, indexOfRoomB);
+                shortestEdges.add(e);
+                validEdgeCount++;
+            }
+        }
+
+        for (Edge e : shortestEdges) {
+            connectRooms(e.a(), e.b());
         }
     }
 
@@ -153,8 +185,13 @@ public class WorldGenerator {
         int ay = a.getCenter().y();
         int by = b.getCenter().y();
 
-        drawHorizontalHallway(ax, bx, ay);
-        drawVerticalHallway(ay, by, bx);
+        if (RANDOM.nextBoolean()) {
+            drawHorizontalHallway(ax, bx, ay);
+            drawVerticalHallway(ay, by, bx);
+        } else {
+            drawHorizontalHallway(ax, bx, by);
+            drawVerticalHallway(ay, by, ax);
+        }
     }
 
     private void connectRooms(Room a, Room b) {
@@ -177,17 +214,5 @@ public class WorldGenerator {
                 }
             }
         }
-    }
-
-    public static void main(String[] args) {
-        TERenderer ter = new TERenderer();
-        int w = 120;
-        int h = 60;
-        ter.initialize(w, h);
-
-        WorldGenerator wg = new WorldGenerator(w, h, 1123);
-        wg.generate();
-
-        ter.renderFrame(wg.world);
     }
 }
